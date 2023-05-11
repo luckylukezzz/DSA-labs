@@ -26,10 +26,9 @@ struct HashTable{
     int hashfunc(string user_name){
         int sum = 0;
         int hash = 0;
-        for (int i = 0; user_name[i] != '\0'; ++i) {
-            sum++;
+         for(int i = 0;i< user_name.length(); i++){
+            sum += int(user_name[i]);
         }
-        
         hash = sum % MAX_LENGTH;
 
         return hash;
