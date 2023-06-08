@@ -4,52 +4,58 @@
 
 using namespace std;
 
-int findMinimumKey(const vector<int>& keyValues, const vector<bool>& mstSet) {
-    int minValue = INT_MAX;
+// Function to find the vertex with the minimum key value
+int findMinKey(const vector<int>& key, const vector<bool>& mstSet) {
+    int minVal = INT_MAX;
     int minIndex;
 
-    for (int v = 0; v < keyValues.size(); v++) {
-        if (!mstSet[v] && keyValues[v] < minValue) {
-            minValue = keyValues[v];
+    for (int v = 0; v < key.size(); v++) {
+        if (!mstSet[v] && key[v] < minVal) {
+            minVal = key[v];
             minIndex = v;
         }
     }
     return minIndex;
 }
 
-void printMinimumSpanningTree(const vector<int>& parentIndices, const vector<vector<int>>& graph) {
+// Function to print the Minimum Spanning Tree
+void printMST(const vector<int>& parent, const vector<vector<int>>& graph) {
     cout << "Minimum Spanning Tree:" << endl;
-    cout << "Edge  => Weight" << endl;
-    for (int i = 1; i < parentIndices.size(); i++) {
-        cout << parentIndices[i] << " to " << i << "=> " << graph[i][parentIndices[i]] << endl;
+    cout << "Edge : Weight" << endl;
+    for (int i = 1; i < parent.size(); i++) {
+        cout << parent[i] << " => " << i << ": " << graph[i][parent[i]] << endl;
     }
 }
 
-void buildMinimumSpanningTree(const vector<vector<int>>& adjacencyMatrix) {
-    int size = adjacencyMatrix.size();
-    vector<int> parentIndices(size);
-    vector<bool> mstSet(size, false);
-    vector<int> keyValues(size, INT_MAX);
+// Function to find the MST using Prim's algorithm
+void primMST(const vector<vector<int>>& graph, int startVertex) {
+    int size = graph.size();
+    vector<int> parent(size, -1); // Array to store the parent of each vertex in MST
+    vector<int> key(size, INT_MAX); // Array to store the key values of vertices
+    vector<bool> mstSet(size, false); // Array to track if a vertex is included in MST
 
-    keyValues[0] = 0; // Start with the first vertex
+    key[startVertex] = 0; // Start with the given startVertex
+    parent[startVertex] = -1; // StartVertex has no parent
 
+    // Construct the MST with size-1 edges
     for (int count = 0; count < size - 1; count++) {
-        int u = findMinimumKey(keyValues, mstSet);
-        mstSet[u] = true;
+        int u = findMinKey(key, mstSet); // Find the vertex with the minimum key value
+        mstSet[u] = true; // Include the vertex in the MST
 
+        // Update the key values and parent for adjacent vertices not yet included in MST
         for (int v = 0; v < size; v++) {
-            if (adjacencyMatrix[u][v] && !mstSet[v] && adjacencyMatrix[u][v] < keyValues[v]) {
-                parentIndices[v] = u;
-                keyValues[v] = adjacencyMatrix[u][v];
+            if (graph[u][v] && !mstSet[v] && graph[u][v] < key[v]) {
+                parent[v] = u; // Set u as the parent of v in MST
+                key[v] = graph[u][v]; // Update the key value of v
             }
         }
     }
 
-    printMinimumSpanningTree(parentIndices, adjacencyMatrix);
+    printMST(parent, graph); // Print the Minimum Spanning Tree
 }
 
 int main() {
-    vector<vector<int>> adjacencyMatrix = {
+    vector<vector<int>> graph = {
         {0, 3, 0, 0, 0, 1},
         {3, 0, 2, 1, 10, 0},
         {0, 2, 0, 3, 0, 5},
@@ -58,7 +64,9 @@ int main() {
         {1, 0, 5, 0, 4, 0}
     };
 
-    buildMinimumSpanningTree(adjacencyMatrix);
+    int startVertex = 0; // Starting vertex for MST
+
+    primMST(graph, startVertex); // Find the MST using Prim's algorithm
 
     return 0;
 }
